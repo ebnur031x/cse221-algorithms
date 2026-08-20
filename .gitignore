@@ -1,0 +1,28 @@
+# Compiled Java class files
+*.class
+
+# Archives
+*.zip
+
+# Course reference materials (PDFs, slides, screenshots) — not redistributed
+/resources/
+
+# Root-level scratch/experiment file, superseded by assignment-2/b-count-pairs-square-less-bit
+/Main.java
+
+# _A1D: only the completed Java solution + task statement are tracked.
+# cpp/py are untouched judge boilerplate, and the checker/grader/instruction
+# files are instructor-provided autograder infrastructure, not coursework.
+/_A1D/cpp/
+/_A1D/py/
+/_A1D/java/_A1D/_A1D.cpp
+/_A1D/java/_A1D/_A1D_Checker.bat
+/_A1D/java/_A1D/_A1D_Instruction.md
+/_A1D/java/_A1D/Solution.class
+
+# A5: empty placeholder created by the judge, no content yet
+/A5/f.txt
+
+# OS cruft
+Thumbs.db
+.DS_Store
