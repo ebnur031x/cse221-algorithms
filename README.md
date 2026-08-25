@@ -27,6 +27,10 @@ javac Main.java
 java Main < sample_input.txt
 ```
 
+## Study Notes
+
+- [`Dijkstra — My Understanding Notes`](Notes/Dijkstra_Bellman-Ford/Dijkstra_my_notes.md) — step-by-step mental model, Java translation, full trace, and the confusing parts that are now clear.
+
 ## Notes
 
 - Compiled `.class` files and course reference materials (PDFs, slides) are
