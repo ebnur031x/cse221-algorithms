@@ -1,1 +1,122 @@
+*MST (Minimum Spanning Tree)
+  "Connect all nodes with minimum total cost, no cycles"
 
+*Kruskal (the algorithm)
+   "Sort edges cheapest → expensive → take if no cycle"
+
+*DSU = the helper/tool
+ Used inside Kruskal to quickly check:
+    "Are these two nodes already in the same group?"
+
+
+MST = What we want
+ ↓
+Kruskal = How we get it
+ ↓
+DSU = Tool Kruskal uses
+
+-------------------
+Kruskal
+A—B = 1
+B—C = 2
+A—C = 3
+C—D = 4
+A—D = 10
+so, check edges from cheapest
+// A—B (1) → take ✅
+// B-C (2) → take ✅
+// A-C (3) → skip (Already through A to C)
+// C-D (10)= take
+
+// Final, A-1-B-2-C-4-D = 7
+
+so, the cost from A to D is 7, even tho there were more paths, we choose the cheapest and connect all. 
+so, All 4 nodes connected, v-1=3 edges, and total cost = 7.
+---------------------
+DSU= Disjoint set union, "“Are these two nodes already connected?”
+
+ok, so when kruska sees, A-C, it must be answer, "Are A and C already connected somehow?"
+
+if YES, adding this edge creates a cycle
+if NO, take the edge and connect them 
+
+for example, A — B — C, see C is already connected
+
+so, its entire job bascailly, 
+"Keep track of which nodes belong to the same group."
+
+Gradually trying to make one big group containing all nodes.
+
+parent[2]=1, means node 2's parent is node 1.
+
+And initially, a node is its own parent: parent[1] = 1
+
+so, parent[child] = parent; 
+
+
+
+union merge, how union merge geneally happends, 
+start
+// their own group
+parent[1]=1
+parent[2]=2
+parent[3]=3
+
+union (1,2)// first one
+we connect 2 under 1
+2 → 1
+
+then, the important part,
+union(2,3)
+we first find their roots
+root of 2 =1 
+root of 3 = 3
+
+then merge the groups, usally connectiing roots, like
+3 → 1
+
+   1
+  ↑ ↑
+  2 3
+
+  key rule
+   "dont blindlydo parent[b=a]. find roots first then connect one root to the other root. 
+
+   bit code
+     rootA = find (a);
+     rootB = find (b);
+     parent[rootB] = rootA;
+     example
+     union(2, 3)
+     when, 
+     2 → 1
+     3 → 3
+
+     rootA = find(2);1
+     rootB = find (3); 3
+     parent[]
+
+     So, 3 → 2 → 1
+                 ↑
+                root
+
+find (3)
+parent[3] = 2 → not myself
+parent[2] = 1 → not myself
+parent[1] = 1 → FOUND ROOT
+
+so, find(3)=1
+
+static int find(int x) {
+    if (parent[x] == x) {
+        return x;
+    }
+    return parent[x] = find(parent[x]);
+}
+
+That line:
+parent[x] = find(parent[x]);
+"Find my ultimate root, then make that root my direct parent."
+
+
+ 
