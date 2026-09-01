@@ -1,122 +1,490 @@
-*MST (Minimum Spanning Tree)
-  "Connect all nodes with minimum total cost, no cycles"
+# MST + Kruskal + DSU — My Mental Model
 
-*Kruskal (the algorithm)
-   "Sort edges cheapest → expensive → take if no cycle"
+> This is the version I should reread when I forget the topic.  
+> Goal: remember the **movie**, not memorize random code.
 
-*DSU = the helper/tool
- Used inside Kruskal to quickly check:
-    "Are these two nodes already in the same group?"
+---
 
+## 1. The big picture
 
+```
 MST = What we want
- ↓
-Kruskal = How we get it
- ↓
-DSU = Tool Kruskal uses
+↓
+Kruskal = One method to build it
+↓
+DSU = The helper Kruskal uses to avoid cycles
+```
 
--------------------
-Kruskal
-A—B = 1
-B—C = 2
-A—C = 3
-C—D = 4
-A—D = 10
-so, check edges from cheapest
-// A—B (1) → take ✅
-// B-C (2) → take ✅
-// A-C (3) → skip (Already through A to C)
-// C-D (10)= take
+### In my own words
 
-// Final, A-1-B-2-C-4-D = 7
+**MST:** connect the whole graph as cheaply as possible.
 
-so, the cost from A to D is 7, even tho there were more paths, we choose the cheapest and connect all. 
-so, All 4 nodes connected, v-1=3 edges, and total cost = 7.
----------------------
-DSU= Disjoint set union, "“Are these two nodes already connected?”
+More precisely:
 
-ok, so when kruska sees, A-C, it must be answer, "Are A and C already connected somehow?"
+- weighted graph
+- usually **undirected**
+- all vertices must be connected
+- no cycles
+- exactly **V - 1 edges**
+- among all such trees, minimum total edge cost
 
-if YES, adding this edge creates a cycle
-if NO, take the edge and connect them 
+> The important thing: MST is about the **total cost of connecting everybody**, not the shortest distance from one node to another.
 
-for example, A — B — C, see C is already connected
+---
 
-so, its entire job bascailly, 
-"Keep track of which nodes belong to the same group."
+# 2. Why exactly V - 1 edges?
 
-Gradually trying to make one big group containing all nodes.
+A tree with:
 
-parent[2]=1, means node 2's parent is node 1.
+- 4 vertices → 3 edges
+- 5 vertices → 4 edges
 
-And initially, a node is its own parent: parent[1] = 1
+So for (V) vertices:
 
-so, parent[child] = parent; 
+```
+V - 1 edges
+```
 
+If all vertices are connected and we have more edges than that, there must be a cycle.
 
+So my quick MST check is:
 
-union merge, how union merge geneally happends, 
-start
-// their own group
-parent[1]=1
-parent[2]=2
-parent[3]=3
+> **Connected + no cycle + V-1 edges = tree.**
 
-union (1,2)// first one
-we connect 2 under 1
+---
+
+# 3. Kruskal — the actual strategy
+
+Kruskal says:
+
+> **Look at edges from cheapest to most expensive. Take an edge only if it does not create a cycle.**
+
+Example:
+
+```
+A-B = 1
+B-C = 2
+A-C = 3
+C-D = 4
+A-D = 10
+```
+
+Sorted already:
+
+1. A-B (1) → take
+2. B-C (2) → take
+3. A-C (3) → skip, A and C are already connected
+4. C-D (4) → take
+
+Final:
+
+```
+A --1-- B --2-- C --4-- D
+
+Total = 7
+Edges = 3 = V-1
+```
+
+The core movie:
+
+```
+Sort edges
+↓
+Cheapest edge
+↓
+Already connected?
+├─ YES → skip (cycle)
+└─ NO  → take + connect groups
+↓
+Stop when V-1 edges are selected
+```
+
+---
+
+# 4. Where DSU comes in
+
+My confusion was basically:
+
+> "Kruskal knows it should avoid cycles, but how does it know whether two nodes are already connected?"
+
+Answer: **DSU**.
+
+DSU = **Disjoint Set Union**.
+
+Its entire job:
+
+> **Keep track of which nodes currently belong to the same group.**
+
+Mental model:
+
+```
+Start:
+{A} {B} {C} {D}
+
+Take A-B:
+{A,B} {C} {D}
+
+Take B-C:
+{A,B,C} {D}
+
+Now A-C?
+A and C are already in the same group → skip
+
+Take C-D:
+{A,B,C,D}
+```
+
+So Kruskal is gradually trying to make:
+
+> **one big group containing all nodes**
+
+without creating a cycle.
+
+---
+
+# 5. parent[] — how DSU remembers groups
+
+Initially everyone is alone:
+
+```
+parent[1] = 1
+parent[2] = 2
+parent[3] = 3
+```
+
+Meaning every node is its own group/root.
+
+After:
+
+```
+union(1, 2)
+```
+
+we can get:
+
+```
 2 → 1
+```
 
-then, the important part,
-union(2,3)
-we first find their roots
-root of 2 =1 
-root of 3 = 3
+so:
 
-then merge the groups, usally connectiing roots, like
+```
+parent[2] = 1
+parent[1] = 1
+```
+
+## The thing I was confused about
+
+Suppose:
+
+```
+2 → 1
+```
+
+Then we do:
+
+```
+union(2, 3)
+```
+
+Should 3 point to 2 because 2 is the node mentioned?
+
+**No. Think groups, not the last individual connection.**
+
+First:
+
+```
+find(2) = 1
+find(3) = 3
+```
+
+Then connect the **roots/groups**:
+
+```
 3 → 1
+```
 
-   1
-  ↑ ↑
-  2 3
+So DSU thinks:
 
-  key rule
-   "dont blindlydo parent[b=a]. find roots first then connect one root to the other root. 
+> "What root does this node's group belong to?"
 
-   bit code
-     rootA = find (a);
-     rootB = find (b);
-     parent[rootB] = rootA;
-     example
-     union(2, 3)
-     when, 
-     2 → 1
-     3 → 3
+not:
 
-     rootA = find(2);1
-     rootB = find (3); 3
-     parent[]
+> "Who was the last node I touched?"
 
-     So, 3 → 2 → 1
-                 ↑
-                root
+### Key rule
 
-find (3)
-parent[3] = 2 → not myself
-parent[2] = 1 → not myself
-parent[1] = 1 → FOUND ROOT
+> **Find both roots first, then connect one root to the other.**
 
-so, find(3)=1
+---
 
+# 6. find(x)
+
+Question:
+
+> "Which group does x belong to?"
+
+Example:
+
+```
+3 → 2 → 1
+```
+
+Then:
+
+```
+find(3)
+→ go to 2
+→ go to 1
+→ parent[1] == 1
+→ root found
+```
+
+So:
+
+```
+find(3) = 1
+```
+
+A node is a root when:
+
+```
+parent[x] == x
+```
+
+Basic logic:
+
+```
+if x is its own parent:
+    x is root
+otherwise:
+    find(parent[x])
+```
+
+---
+
+# 7. Path Compression
+
+This was another thing I needed to visualize properly.
+
+Before:
+
+```
+3 → 2 → 1
+```
+
+When we call `find(3)`, it **does not magically know 1**.
+
+### Going deep — same old chain
+
+```
+find(3)
+→ find(2)
+→ find(1)
+→ root found
+```
+
+### Backtracking — more direct
+
+Now we already know the root is 1.
+
+So while returning:
+
+```
+parent[2] = 1
+parent[3] = 1
+```
+
+After:
+
+```
+2 → 1
+3 → 1
+```
+
+My mental phrase:
+
+> **Going deep = same. Backtracking = more direct.**
+
+That is path compression.
+
+Code:
+
+```java
 static int find(int x) {
-    if (parent[x] == x) {
-        return x;
-    }
+    if (parent[x] == x) return x;
     return parent[x] = find(parent[x]);
 }
+```
 
-That line:
+The important part:
+
+```java
 parent[x] = find(parent[x]);
-"Find my ultimate root, then make that root my direct parent."
+```
 
+means:
 
- 
+> Find my ultimate root, then directly make that root my parent.
+
+---
+
+# 8. union(a, b)
+
+Union means:
+
+> Merge the two groups containing a and b.
+
+Logic:
+
+```
+rootA = find(a)
+rootB = find(b)
+
+if rootA != rootB:
+    connect one root to the other
+```
+
+Pseudocode:
+
+```
+UNION(a, b):
+    rootA = FIND(a)
+    rootB = FIND(b)
+
+    if rootA != rootB:
+        parent[rootB] = rootA
+```
+
+---
+
+# 9. Kruskal + DSU together
+
+This is the whole connection:
+
+```
+Kruskal sees edge (u, v)
+
+↓
+DSU asks:
+find(u) == find(v)?
+
+YES
+↓
+Same group already
+Adding edge creates cycle
+→ SKIP
+
+NO
+↓
+Different groups
+→ TAKE edge
+→ UNION(u, v)
+```
+
+Exam-level pseudocode:
+
+```
+KRUSKAL(G):
+    sort all edges by increasing weight
+    initialize DSU
+    MST = empty
+    totalCost = 0
+
+    for each edge (u, v, w):
+        if FIND(u) != FIND(v):
+            add edge to MST
+            UNION(u, v)
+            totalCost += w
+
+        if number of MST edges == V - 1:
+            break
+
+    return MST, totalCost
+```
+
+---
+
+# 10. Modified Kruskal — the one variation I need to remember
+
+Question idea:
+
+> Some edges are mandatory/important and **must be included even if expensive**.
+
+Normal Kruskal:
+
+> Cheapest valid edges first.
+
+Modified Kruskal:
+
+> **Mandatory edges first, even expensive → then normal Kruskal.**
+
+Assuming mandatory edges do not form a cycle:
+
+```
+Initialize DSU
+
+for each mandatory edge:
+    take it
+    UNION(u, v)
+    add cost
+
+Sort remaining edges by weight
+
+for each remaining edge:
+    if FIND(u) != FIND(v):
+        take it
+        UNION(u, v)
+        add cost
+
+    stop at V-1 edges
+```
+
+### One-line memory
+
+> **The only difference: expensive mandatory edges get priority over cheap edges.**
+
+---
+
+# 11. Quick exam checklist
+
+When I see an MST/Kruskal question:
+
+1. Is it **undirected + weighted**?
+2. Need to connect everything with minimum **total** cost?
+3. Sort edges by weight.
+4. Check whether endpoints are already in same DSU group.
+5. Same group → skip.
+6. Different groups → take + union.
+7. Stop at **V-1 edges**.
+8. Add selected weights.
+9. If mandatory edges exist → **force them first**.
+
+---
+
+# Final 20-second recall
+
+```
+MST = cheapest way to connect ALL nodes
+      without cycles
+      using V-1 edges
+
+Kruskal = sort edges cheap → expensive
+
+DSU = remembers groups
+
+find(x) = which root/group am I in?
+
+union(a,b) = merge their groups
+
+same root → skip edge (cycle)
+different roots → take edge + union
+
+Path compression:
+going deep = normal chain
+backtracking = directly connect to root
+
+Modified Kruskal:
+MANDATORY EDGES FIRST, EVEN IF EXPENSIVE
+then normal Kruskal
+```
