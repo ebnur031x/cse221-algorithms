@@ -32,7 +32,48 @@ More precisely:
 
 ---
 
-# 2. Why exactly V - 1 edges?
+# 2. Spanning Tree vs MST — the missing connection
+
+This should be explicit because **MST is literally a Minimum Spanning Tree**.
+
+### Spanning Tree
+
+Take a connected graph and choose enough edges so that:
+
+- **all vertices are included / spanned**
+- everything remains connected
+- there are no cycles
+- therefore it has exactly `V - 1` edges
+
+There can be many possible spanning trees.
+
+### Minimum Spanning Tree (MST)
+
+Among all those spanning trees:
+
+> choose the one with the minimum total edge weight.
+
+So the relationship is:
+
+```
+Graph
+ ↓
+Many possible Spanning Trees
+ ↓
+Choose the minimum-cost one
+ ↓
+MST
+```
+
+My simplest memory:
+
+> **Spanning Tree = a valid way to connect everything with no cycles.**
+>
+> **MST = the cheapest such spanning tree.**
+
+---
+
+# 3. Why exactly V - 1 edges?
 
 A tree with:
 
