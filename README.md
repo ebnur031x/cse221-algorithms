@@ -29,6 +29,7 @@ java Main < sample_input.txt
 
 ## Study Notes
 
+- [`DP — Mental Models & Fundamentals`](Notes/Dynamic_Programming/DP_Mental_Models_and_Fundamentals.md) — state, working backward, recurrence construction, objective-driven combination, base cases, memoization, bottom-up DP, and concrete examples.
 - [`Dijkstra — My Understanding Notes`](Notes/Dijkstra_Bellman-Ford/Dijkstra_my_notes.md) — step-by-step mental model, Java translation, full trace, and the confusing parts that are now clear.
 
 ## Notes
